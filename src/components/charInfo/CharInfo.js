@@ -9,14 +9,14 @@ import ErrorMessage from "../errorMessage/errorMessage";
 import Skeleton from "../skeleton/Skeleton";
 import "./charInfo.scss";
 
-const CharInfo = props => {
+const CharInfo = ({ charId }) => {
   const [char, setChar] = useState(null);
 
   const { loading, error, getCharacter, clearError } = useMarvelService();
 
   const updateChar = () => {
     clearError();
-    const { charId } = props;
+
     if (!charId) {
       return;
     }
@@ -30,7 +30,8 @@ const CharInfo = props => {
 
   useEffect(() => {
     updateChar();
-  }, [props.charId]);
+    // eslint-disable-next-line
+  }, [charId]);
 
   const skeleton = char || loading || error ? null : <Skeleton />;
   const errorMessage = error ? <ErrorMessage /> : null;
