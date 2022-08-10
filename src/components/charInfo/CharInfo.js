@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types"; // ES6
 
 import useMarvelService from "../../services/MarvelService";
@@ -79,12 +80,13 @@ const View = ({ char }) => {
           : "There is no description for this character"}
       </div>
       <div className='char__comics'>Comics:</div>
+
       <ul className='char__comics-list'>
         {comics.length !== 0 ? null : "There is no comics with this character"}
         {comics.slice(0, 9).map((item, id) => {
           return (
             <li className='char__comics-item' key={id}>
-              {item.name}
+              <Link to={"comics/" + id}> {item.name}</Link>
             </li>
           );
         })}
