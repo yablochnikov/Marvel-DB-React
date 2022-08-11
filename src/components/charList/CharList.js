@@ -26,7 +26,7 @@ const CharList = props => {
     getAllCharacters(offset).then(onCharListLoaded);
   };
 
-  const onCharListLoaded = newCharList => {
+  const onCharListLoaded = async newCharList => {
     let ended = false;
 
     if (newCharList.length < 9) {
@@ -89,7 +89,7 @@ const CharList = props => {
 
   const errorMessage = error ? <ErrorMessage /> : null;
   const spinner = loading && !newItemsLoading ? <Spinner /> : null;
-  console.log("CharList!");
+
   return (
     <div className='char__list'>
       <ul className='char__grid'>
