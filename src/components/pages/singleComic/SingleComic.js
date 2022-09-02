@@ -1,8 +1,8 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react"; // ES6
-import useMarvelService from "../../services/MarvelService";
-import Spinner from "../spinner/spinner";
-import ErrorMessage from "../errorMessage/errorMessage";
+import useMarvelService from "../../../services/MarvelService";
+import Spinner from "../../spinner/spinner";
+import ErrorMessage from "../../errorMessage/errorMessage";
 
 import "./singleComic.scss";
 
