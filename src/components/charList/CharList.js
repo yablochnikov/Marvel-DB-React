@@ -1,10 +1,33 @@
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import "./charList.scss";
-import useMarvelService from "../../services/MarvelService";
+
 import ErrorMessage from "../errorMessage/errorMessage";
 import Spinner from "../spinner/spinner";
+
+import useMarvelService from "../../services/MarvelService";
+
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+
+import "./charList.scss";
+
+const setContent = (process, Component, newItemsLoading) => {
+  switch (process) {
+    case "waiting":
+      return <Spinner />;
+      break;
+    case "loading":
+      return newItemsLoading ? <Component /> : <Spinner />;
+      break;
+    case "confirmed":
+      return <Component />;
+      break;
+    case "error":
+      return <ErrorMessage />;
+      break;
+    default:
+      throw new Error("Unexpected process state");
+  }
+};
 
 const CharList = props => {
   const [charList, setCharList] = useState([]);
@@ -14,7 +37,7 @@ const CharList = props => {
   );
   const [charsEnded, setCharsEnded] = useState(false);
 
-  const { loading, error, getAllCharacters } = useMarvelService();
+  const { getAllCharacters, process, setProcess } = useMarvelService();
 
   const duration = 500;
 
@@ -26,7 +49,9 @@ const CharList = props => {
   const onRequest = (offset, initial) => {
     initial ? setNewItemsLoading(false) : setNewItemsLoading(true);
 
-    getAllCharacters(offset).then(onCharListLoaded);
+    getAllCharacters(offset)
+      .then(onCharListLoaded)
+      .then(() => setProcess("confirmed"));
   };
 
   const onCharListLoaded = async newCharList => {
@@ -94,16 +119,10 @@ const CharList = props => {
     );
   }
 
-  const items = renderItems(charList);
-  const errorMessage = error ? <ErrorMessage /> : null;
-  const spinner = loading && !newItemsLoading ? <Spinner /> : null;
-
   return (
     <div className='char__list'>
       <ul className='char__grid'>
-        {errorMessage}
-        {spinner}
-        {items}
+        {setContent(process, () => renderItems(charList), newItemsLoading)}
       </ul>
       <button
         style={{ display: charsEnded ? "none" : "block" }}

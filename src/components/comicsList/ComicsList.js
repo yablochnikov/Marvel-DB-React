@@ -1,13 +1,36 @@
-import "./comicsList.scss";
 import { useState, useEffect } from "react";
+
 import Spinner from "../spinner/spinner";
 import ErrorMessage from "../errorMessage/errorMessage";
+
 import useMarvelService from "../../services/MarvelService";
+
 import { Link } from "react-router-dom";
+
+import "./comicsList.scss";
+
+const setContent = (process, Component, newItemsLoading) => {
+  switch (process) {
+    case "waiting":
+      return <Spinner />;
+      break;
+    case "loading":
+      return !newItemsLoading ? <Component /> : <Spinner />;
+      break;
+    case "confirmed":
+      return <Component />;
+      break;
+    case "error":
+      return <ErrorMessage />;
+      break;
+    default:
+      throw new Error("Unexpected process state");
+  }
+};
 
 const ComicsList = () => {
   const [comics, setComics] = useState([]);
-  const { loading, error, getAllComics } = useMarvelService();
+  const { getAllComics, process, setProcess } = useMarvelService();
   const [newItemsLoading, setNewItemsLoading] = useState(false);
   const [offset, setOffset] = useState(
     Math.floor(Math.random() * (52761 - 0)) + 0
@@ -22,7 +45,9 @@ const ComicsList = () => {
   const onRequest = (offset, initial) => {
     initial ? setNewItemsLoading(false) : setNewItemsLoading(true);
 
-    getAllComics(offset).then(onComicsLoaded);
+    getAllComics(offset)
+      .then(onComicsLoaded)
+      .then(() => setProcess("confirmed"));
   };
 
   const onComicsLoaded = newComics => {
@@ -60,16 +85,11 @@ const ComicsList = () => {
     return <div className='comics__grid'>{items}</div>;
   }
 
-  const items = renderItems(comics);
-  const spinner = loading && !newItemsLoading ? <Spinner /> : null;
-  const errorMessage = error ? <ErrorMessage /> : null;
   return (
     <>
       <div className='comics__list'>
         <ul className='comics__grid'>
-          {spinner}
-          {errorMessage}
-          {items}
+          {setContent(process, () => renderItems(comics), !newItemsLoading)}
         </ul>
         <button
           style={{ display: comicsEnded ? "none" : "block" }}
