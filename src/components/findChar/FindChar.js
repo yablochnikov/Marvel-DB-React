@@ -15,7 +15,7 @@ import "./findChar.scss";
 
 const FindChar = () => {
   const [char, setChar] = useState(null);
-  const { loading, error, getCharByName, clearError } = useMarvelService();
+  const { getCharByName, clearError, process, setProcess } = useMarvelService();
 
   const onCharLoaded = char => {
     setChar(char);
@@ -24,14 +24,17 @@ const FindChar = () => {
   const updateChar = name => {
     clearError();
 
-    getCharByName(name).then(onCharLoaded);
+    getCharByName(name)
+      .then(onCharLoaded)
+      .then(() => setProcess("confirmed"));
   };
 
-  const errorMessage = error ? (
-    <div clasName='char__search-critical-error'>
-      <ErrorMessage />
-    </div>
-  ) : null;
+  const errorMessage =
+    process === "error" ? (
+      <div clasName='char__search-critical-error'>
+        <ErrorMessage />
+      </div>
+    ) : null;
 
   const result = !char ? null : char.length > 0 ? (
     <div className='char__search-wrapper'>
@@ -80,7 +83,7 @@ const FindChar = () => {
             <button
               type='submit'
               className='button button__main'
-              disabled={loading}
+              disabled={process === "loading"}
             >
               <div className='inner'>find</div>
             </button>

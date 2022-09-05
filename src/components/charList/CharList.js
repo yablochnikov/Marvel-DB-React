@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import PropTypes from "prop-types";
 
 import ErrorMessage from "../errorMessage/errorMessage";
@@ -14,16 +14,16 @@ const setContent = (process, Component, newItemsLoading) => {
   switch (process) {
     case "waiting":
       return <Spinner />;
-      break;
+      
     case "loading":
       return newItemsLoading ? <Component /> : <Spinner />;
-      break;
+
     case "confirmed":
       return <Component />;
-      break;
+
     case "error":
       return <ErrorMessage />;
-      break;
+
     default:
       throw new Error("Unexpected process state");
   }
@@ -95,8 +95,8 @@ const CharList = props => {
             className='char__item'
             key={item.id}
             onClick={() => {
-              props.onCharSelected(item.id);
               onCharFocus(i);
+              props.onCharSelected(item.id);
             }}
             onKeyPress={e => {
               if (e.key === "" || e.key === "Enter") {
@@ -111,7 +111,7 @@ const CharList = props => {
         </CSSTransition>
       );
     });
-
+    console.log(items);
     return (
       <TransitionGroup component={"ul"} className='char__grid'>
         {items}{" "}
@@ -119,11 +119,13 @@ const CharList = props => {
     );
   }
 
+  const elements = useMemo(() => {
+    return setContent(process, () => renderItems(charList), newItemsLoading);
+  }, [process]);
+
   return (
     <div className='char__list'>
-      <ul className='char__grid'>
-        {setContent(process, () => renderItems(charList), newItemsLoading)}
-      </ul>
+      <ul className='char__grid'>{elements}</ul>
       <button
         style={{ display: charsEnded ? "none" : "block" }}
         className='button button__main button__long'
